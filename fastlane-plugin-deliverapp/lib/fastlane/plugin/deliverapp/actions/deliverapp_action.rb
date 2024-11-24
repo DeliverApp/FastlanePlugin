@@ -60,7 +60,7 @@ module Fastlane
         UI.success(serverURL)
         uri = URI.parse(serverURL)
        
-        http = Net::HTTP.new(uri.host, uri.port);
+        http = Net::HTTP.new(uri.host);
         request = Net::HTTP::Post.new(uri)
         form_data = [
             ['appId', params[:appKey]],
