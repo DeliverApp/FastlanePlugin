@@ -60,7 +60,9 @@ module Fastlane
         UI.success(serverURL)
         uri = URI.parse(serverURL)
        
-        http = Net::HTTP.new(uri.host);
+        http = Net::HTTP.new(uri.host, uri.port);
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_PEER # Verify the SSL certificate
         request = Net::HTTP::Post.new(uri)
         form_data = [
             ['appId', params[:appKey]],
