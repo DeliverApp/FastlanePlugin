@@ -21,7 +21,9 @@ module Fastlane
           # Parse APK version and bundleID
           xml = ApkXml.new(binary)
           manifest_xml = xml.parse_xml("AndroidManifest.xml", true, true)
+          UI.message(manifest_xml)
           binary_version = manifest_xml.match(/android:versionName="(.*?)"/)[1]
+          binary_number = Integer(manifest_xml.match(/android:versionCode="(.*?)"/)[1]).to_s
           binary_bundleId = manifest_xml.match(/package="(.*?)"/)[1]
         elsif binary.end_with?('.ipa')
           UI.message("Detected an iOS IPA")
@@ -29,13 +31,14 @@ module Fastlane
           ipa_path = "#{binary}/Payload/*.app/Info.plist"
           plist = Plist.parse_xml(ipa_path)
           binary_version = plist['CFBundleShortVersionString']
+          binary_number = plist['TODO']
           binary_bundleId = plist['CFBundleIdentifier']
         else
           UI.error("Unknown binary type. Please provide a valid APK or IPA file.")
         end
 
         default_git_commit_message = Actions.sh("git log -1 --pretty=%B").strip
-        default_git_commit_hash = Actions.sh("git rev-parse HEAD").strip
+        default_git_commit_hash = Actions.sh("git rev-parse --short HEAD").strip
         default_git_committer_email = Actions.sh("git log -1 --pretty=%ae").strip
         default_git_branch_name = Actions.sh("git rev-parse --abbrev-ref HEAD").strip
 
@@ -61,19 +64,17 @@ module Fastlane
         uri = URI.parse(serverURL)
        
         http = Net::HTTP.new(uri.host, uri.port);
-        http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_PEER # Verify the SSL certificate
         request = Net::HTTP::Post.new(uri)
         form_data = [
             ['appId', params[:appKey]],
             ['version', binary_version],
+            ['buildNumber', binary_number],
             ['file', File.open(binary)],
             ['branch', branch_name],
-            ['versionningOrigin', branch_name],
             ['commitHash', commit_hash],
             ['commitMessage', commit_message],
             ['pipelineId', pipeline_identifier],
-            ['committerId', committer_email],
+            ['committerEmail', committer_email],
             ['customerIssue', issue_id]
         ]
 
