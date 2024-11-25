@@ -30,7 +30,7 @@ module Fastlane
           ipa_path = "#{binary}/Payload/*.app/Info.plist"
           plist = Plist.parse_xml(ipa_path)
           binary_version = plist['CFBundleShortVersionString']
-          binary_number = plist['TODO']
+          binary_number = plist['CFBundleVersion']
           binary_bundleId = plist['CFBundleIdentifier']
         else
           UI.error("Unknown binary type. Please provide a valid APK or IPA file.")
