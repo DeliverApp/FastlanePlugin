@@ -21,7 +21,6 @@ module Fastlane
           # Parse APK version and bundleID
           xml = ApkXml.new(binary)
           manifest_xml = xml.parse_xml("AndroidManifest.xml", true, true)
-          UI.message(manifest_xml)
           binary_version = manifest_xml.match(/android:versionName="(.*?)"/)[1]
           binary_number = Integer(manifest_xml.match(/android:versionCode="(.*?)"/)[1]).to_s
           binary_bundleId = manifest_xml.match(/package="(.*?)"/)[1]
@@ -64,6 +63,8 @@ module Fastlane
         uri = URI.parse(serverURL)
        
         http = Net::HTTP.new(uri.host, uri.port);
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_PEER # Verify the SSL certificate
         request = Net::HTTP::Post.new(uri)
         form_data = [
             ['appId', params[:appKey]],
