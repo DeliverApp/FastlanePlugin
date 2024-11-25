@@ -1,6 +1,7 @@
 require 'fastlane/action'
 require 'apktools/apkxml'
-require 'plist'
+require 'cfpropertylist'
+require 'zip'
 require_relative '../helper/deliverapp_helper'
 
 module Fastlane
@@ -26,12 +27,18 @@ module Fastlane
           binary_bundleId = manifest_xml.match(/package="(.*?)"/)[1]
         elsif binary.end_with?('.ipa')
           UI.message("Detected an iOS IPA")
-          # Parse IPA version and bundleID
-          ipa_path = "#{binary}/Payload/*.app/Info.plist"
-          plist = Plist.parse_xml(ipa_path)
-          binary_version = plist['CFBundleShortVersionString']
-          binary_number = plist['CFBundleVersion']
-          binary_bundleId = plist['CFBundleIdentifier']
+          Zip::File.open(binary) do |zip_file|
+            # Parse IPA version and bundleID
+            info_plist_entry = zip_file.glob('Payload/*.app/Info.plist').first
+            zip_file.extract(info_plist_entry, "./info.plist") unless File.exist?("./info.plist")
+            
+            plist = CFPropertyList::List.new(:file => "./info.plist")
+            data = CFPropertyList.native_types(plist.value)
+            
+            binary_version = data['CFBundleShortVersionString']
+            binary_number = data['CFBundleVersion']
+            binary_bundleId = data['CFBundleIdentifier']
+          end
         else
           UI.error("Unknown binary type. Please provide a valid APK or IPA file.")
         end

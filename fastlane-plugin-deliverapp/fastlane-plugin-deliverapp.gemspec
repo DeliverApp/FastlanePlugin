@@ -17,7 +17,8 @@ Gem::Specification.new do |spec|
   spec.metadata['rubygems_mfa_required'] = 'true'
   spec.required_ruby_version = '>= 2.6'
   spec.add_dependency "apktools"
-  spec.add_dependency "plist"
+  spec.add_dependency "CFPropertyList"
+  spec.add_dependency "rubyzip"
 
   # Don't add a dependency to fastlane or fastlane_re
   # since this would cause a circular dependency
