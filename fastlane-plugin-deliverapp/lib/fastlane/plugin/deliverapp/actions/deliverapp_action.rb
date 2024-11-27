@@ -47,6 +47,7 @@ module Fastlane
         default_git_commit_hash = Actions.sh("git rev-parse --short HEAD").strip
         default_git_committer_email = Actions.sh("git log -1 --pretty=%ae").strip
         default_git_branch_name = Actions.sh("git rev-parse --abbrev-ref HEAD").strip
+        default_git_change_log = Actions.sh("git log --pretty=%B").strip
 
         # Gather Git metadata
         commit_message = ENV['CI_COMMIT_MESSAGE'] || default_git_commit_message || params[:commit_message] ||  "Not found"
@@ -54,6 +55,7 @@ module Fastlane
         committer_email = ENV['GITLAB_USER_EMAIL'] || default_git_committer_email  || params[:committer_email] ||  "Not found"
         branch_name = ENV['CI_COMMIT_BRANCH'] || default_git_branch_name  || params[:branch_name] ||  "Not found"
         pipeline_identifier = ENV['CI_PIPELINE_ID'] || params[:pipeline_identifier] ||  "Not found"
+        change_log = params[:change_log] || default_git_change_log
 
         regex = /(?:\s|^)([A-Z]+-[0-9]+)(?=\s|$)?/
         issue_id = commit_message.match(regex)
@@ -83,7 +85,8 @@ module Fastlane
             ['commitMessage', commit_message],
             ['pipelineId', pipeline_identifier],
             ['committerEmail', committer_email],
-            ['customerIssue', issue_id]
+            ['customerIssue', issue_id],
+            ['changeLog', change_log],
         ]
 
         puts form_data.inspect
@@ -147,6 +150,10 @@ module Fastlane
                     type: String),
           FastlaneCore::ConfigItem.new(key: :branch_name,
                     description: "The branch name",
+                    optional: true,
+                    type: String),
+          FastlaneCore::ConfigItem.new(key: :change_log,
+                    description: "The change log you want",
                     optional: true,
                     type: String)
         ]
