@@ -55,7 +55,7 @@ module Fastlane
         committer_email = ENV['GITLAB_USER_EMAIL'] || default_git_committer_email  || params[:committer_email] ||  "Not found"
         branch_name = ENV['CI_COMMIT_BRANCH'] || default_git_branch_name  || params[:branch_name] ||  "Not found"
         pipeline_identifier = ENV['CI_PIPELINE_ID'] || params[:pipeline_identifier] ||  "Not found"
-        change_log = params[:change_log] || default_git_change_log
+        change_log = params[:change_log] || ""
 
         regex = /(?:\s|^)([A-Z]+-[0-9]+)(?=\s|$)?/
         issue_id = commit_message.match(regex)
@@ -67,7 +67,7 @@ module Fastlane
         end
 
         # Send APK and metadata to server
-        serverURL = "https://store.deliverapp.io/api/app/" + params[:appKey] + "/" + binary_bundleId +"/build"
+        serverURL = "https://store.deliverapp.io/api/app/" + params[:appKey] +"/build"
         UI.success(serverURL)
         uri = URI.parse(serverURL)
        
