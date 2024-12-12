@@ -47,7 +47,6 @@ module Fastlane
         default_git_commit_hash = Actions.sh("git rev-parse --short HEAD").strip
         default_git_committer_email = Actions.sh("git log -1 --pretty=%ae").strip
         default_git_branch_name = Actions.sh("git rev-parse --abbrev-ref HEAD").strip
-        default_git_change_log = Actions.sh("git log --pretty=%B").strip
 
         # Gather Git metadata
         commit_message = ENV['CI_COMMIT_MESSAGE'] || default_git_commit_message || params[:commit_message] ||  "Not found"
